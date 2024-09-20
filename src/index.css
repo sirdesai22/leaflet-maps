@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.leaflet-container {
+  height: 100vh;
+}
+@font-face {
+  font-family: comfy-comic;
+  src: url(/Comfy\ Feeling.otf);
+}
+.my-custom-pin{
+  font-size: 25px;
+  font-weight: 800;
+  color: rgb(255, 255, 255);
+  font-family: comfy-comic;
+  text-shadow: 2px 2px #191919;
+  border: 1px solid #191919;
+  background: rgb(255, 53, 53);
+  -webkit-text-stroke: 1px #000;
+  border-radius: 100%;
+}
