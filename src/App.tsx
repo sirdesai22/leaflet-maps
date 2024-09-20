@@ -2,9 +2,8 @@ import { MapContainer, Marker, Popup, TileLayer} from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
-type Props = {};
 
-const App = (props: Props) => {
+const App = () => {
   const position = L.latLng(15.8497, 74.4977); 
 
   const createCustomIcon = (placeholder: string) => {
