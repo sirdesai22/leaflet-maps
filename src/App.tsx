@@ -1,15 +1,17 @@
 import { MapContainer, Marker, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { LatLng } from "leaflet";
 // import createCustomMarkerIcon from "./hooks/createCustomIcon";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import createUserMarkerIcon from "./hooks/createUserMarkerIcon";
 import Navbar from "./components/Navbar";
+import createCustomMarkerIcon from "./hooks/createCustomMarkerIcon";
+import DraggableMarker from "./components/DraggableMarker";
 
 const App = () => {
   // const position = L.latLng(15.8497, 74.4977);
   const [location, setLocation] = useState<L.LatLng>();
-  console.log(location);
+  // console.log(location);
 
   const handleGetLocation = () => {
     if (!navigator.geolocation) {
@@ -21,7 +23,7 @@ const App = () => {
       (position) => {
         const { latitude, longitude } = position.coords;
         setLocation(L.latLng(latitude, longitude));
-        console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        // console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
       },
       (error) => {
         console.log(`Error: ${error.message}`);
@@ -33,28 +35,23 @@ const App = () => {
     handleGetLocation();
   }, []);
 
-  // const markers = [
-  //   {
-  //     geolocation: L.latLng(15.8497, 74.4977),
-  //     popup: "By sirdesai.exe",
-  //     text: "Belgaum is best!",
-  //   },
-  //   {
-  //     geolocation: L.latLng(15.828231163460496, 74.48235412540896),
-  //     popup: "By sirdesai.exe",
-  //     text: "Miheer stays here!",
-  //   },
-  //   {
-  //     geolocation: L.latLng(15.826531, 74.497589),
-  //     popup: "By sirdesai.exe",
-  //     text: "Shubham lives here!",
-  //   },
-  //   {
-  //     geolocation: L.latLng(15.83986453524527, 74.51026645110518),
-  //     popup: "By sirdesai.exe",
-  //     text: "Prathamesh coded this here!",
-  //   },
-  // ];
+  const [marker, setMarker] = useState<LatLng | null>(null);
+  const [savedLocations, setSavedLocations] = useState<LatLng[]>([]);
+
+  const dropPin = () => {
+    console.log("pin dropped");
+    setMarker(location);
+  };
+
+  const handleMarkerDragEnd = useCallback((e: any) => {
+    console.log("Marker dragged to:", e.target.getLatLng());
+    setMarker(e.target.getLatLng());
+  }, []);
+
+  const savePin = () => {
+    setSavedLocations([...savedLocations, marker]);
+    setMarker(null); // Clear the current marker
+  };
 
   // Belgaum co-ordinates
   // 15.8497° N, 74.4977° E
@@ -63,7 +60,7 @@ const App = () => {
   } else {
     return (
       <div className="">
-        <Navbar />
+        <Navbar dropPin={dropPin} savePin={savePin} />
         <MapContainer center={location} zoom={16} scrollWheelZoom={true}>
           <TileLayer
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -71,16 +68,22 @@ const App = () => {
           />
           {/* User marker  */}
           <Marker position={location} icon={createUserMarkerIcon()}></Marker>
+          {marker && (
+            <Marker
+              position={marker}
+              draggable={true}
+              eventHandlers={
+                {
+                  // click: handleMarkerClick,
+                  dragend: handleMarkerDragEnd,
+                }
+              }
+            ></Marker>
+          )}
 
-          {/* {markers.map((marker, index) => (
-          <Marker
-            key={index}
-            position={marker.geolocation}
-            icon={createCustomMarkerIcon(marker.text)}
-          >
-            <Popup>{marker.popup}</Popup>
-          </Marker>
-        ))} */}
+          {savedLocations.map((pins, index) => (
+            <Marker key={index} position={pins}></Marker>
+          ))}
         </MapContainer>
       </div>
     );
