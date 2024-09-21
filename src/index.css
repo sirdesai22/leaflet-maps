@@ -20,3 +20,10 @@
   -webkit-text-stroke: 1px #000;
   border-radius: 100%;
 }
+.my-user-pin{
+  width: 5px;
+  height: 5px;
+  border-radius: 100%;
+  background: rgb(0, 102, 255);
+  border: 4px solid rgb(0, 78, 194);
+}
